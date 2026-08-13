@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>तीन बजे — Hostel Room 304 Radio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=11">
+</head>
+<body>
+
+  <div class="app-viewport">
+
+    <!-- Background Image -->
+    <div class="bg-layer" style="background-image: url('assets/background.png');"></div>
+
+    <!-- Window Rain Box - Positioned exactly over balcony window (right side of image) -->
+    <div class="window-rain-box" id="windowRainBox">
+      <canvas id="rainCanvas"></canvas>
+
+      <!-- Window Rain Toggle Button inside window frame -->
+      <div class="rain-switch-overlay">
+        <button id="windowRainToggleBtn" class="rain-switch-btn" title="Toggle Natural Rain Sound">
+          <span class="rain-icon">🌧️</span>
+          <span id="windowRainStatus" class="rain-status-text">Rain Sound OFF</span>
+          <span class="switch-slider"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Steam Effect Overlays over Chai Cups & Kettle -->
+    <div class="steam-container kettle-steam">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="steam-container cup1-steam">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="steam-container cup2-steam">
+      <span></span><span></span><span></span>
+    </div>
+
+    <!-- Lamp Warm Flicker Glow Overlay -->
+    <div class="lamp-glow-overlay"></div>
+
+    <!-- TOP BAR -->
+    <header class="top-bar">
+      <div class="brand">
+        <h1 class="hindi-title">तीन बजे</h1>
+        <span class="sub-tag">Hostel Room 304 Radio</span>
+      </div>
+
+      <div class="quote-ticker-wrapper">
+        <span class="quote-icon">💭</span>
+        <p id="quoteTicker">मेहनत आज, सुकून कल. — future me</p>
+        <button id="quoteRefreshBtn" class="quote-refresh-btn" title="Next Quote">🔄</button>
+      </div>
+
+      <div class="online-badge">
+        <span class="pulsing-dot"></span>
+        <span id="listenerCount">1</span>
+        <span class="online-label">engineers awake right now</span>
+      </div>
+    </header>
+
+    <!-- HORIZONTAL PLAYER CARD - current song + seek + controls -->
+    <div class="horizontal-player-wrapper">
+      <div class="horizontal-player-card">
+        <div class="cassette-disc-box">
+          <div class="vinyl-disc" id="vinylDisc">
+            <div class="vinyl-grooves"></div>
+            <div class="vinyl-shine"></div>
+            <div class="vinyl-label">
+              <span class="vinyl-label-live">● LIVE</span>
+              <span class="vinyl-label-title">तीन बजे</span>
+            </div>
+            <div class="vinyl-hole"></div>
+          </div>
+        </div>
+
+        <div class="player-center-info">
+          <div class="now-playing-header">
+            <span class="live-fm-tag">90.4 FM</span>
+            <span class="playlist-tag-pill" id="currentPlaylistName">3 AM Gen-Z Chill</span>
+          </div>
+          <div class="track-title-scroll"><h2 id="trackTitle">Select a Track</h2></div>
+          <div class="artist-subtitle" id="artistName">Teen Baje Player</div>
+
+          <!-- Seek Bar -->
+          <div class="seek-container">
+            <span id="currentTime" class="time-stamp">0:00</span>
+            <input type="range" id="seekBar" class="seek-bar" value="0" min="0" max="100" step="0.1">
+            <span id="durationTime" class="time-stamp">0:00</span>
+          </div>
+        </div>
+
+        <div class="player-controls-right">
+          <div class="main-buttons-group">
+            <button id="prevBtn" class="control-btn" title="Previous (P)">⏮️</button>
+            <button id="playBtn" class="control-btn play-btn-main" title="Play/Pause (Space)">▶️</button>
+            <button id="nextBtn" class="control-btn" title="Next (N)">⏭️</button>
+          </div>
+          <div class="volume-slider-box">
+            <span class="vol-icon">🎵</span>
+            <input type="range" id="musicVol" class="vol-slider" min="0" max="1" step="0.01" value="0.85">
+          </div>
+          <div class="volume-slider-box">
+            <span class="vol-icon">🌧️</span>
+            <input type="range" id="rainVol" class="vol-slider" min="0" max="1" step="0.01" value="0.6">
+          </div>
+        </div>
+      </div>
+
+      <!-- Playlist Tabs -->
+      <div class="playlist-horizontal-tabs" id="playlistTabs"></div>
+    </div>
+
+    <!-- BOTTOM BAR: Tracklist Drawer -->
+    <div class="bottom-controls-bar">
+      <button id="toggleTracklistBtn" class="glass-pill-btn">
+        📜 Full Song Queue
+      </button>
+      <div class="keyboard-hints">
+        <span class="key-badge">Space</span> Play/Pause • <span class="key-badge">N</span> Next • <span class="key-badge">P</span> Prev • <span class="key-badge">R</span> Window Rain
+      </div>
+    </div>
+
+    <!-- Tracklist Modal -->
+    <div class="tracklist-modal" id="tracklistModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>🎵 Playlist Tracks</h3>
+          <button id="closeModalBtn" class="close-btn">&times;</button>
+        </div>
+        <ul id="trackList" class="track-ul"></ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Audio Elements -->
+  <audio id="mainAudio" preload="auto"></audio>
+  <audio id="rainAudio" loop preload="auto" src="assets/rain.mp3"></audio>
+
+  <script src="playlists.js?v=11"></script>
+  <script src="script.js?v=11"></script>
+</body>
+</html>

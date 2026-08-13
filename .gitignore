@@ -1,0 +1,12 @@
+# Local music source lives on OneDrive via a junction - never commit it
+/music/
+
+# Node
+node_modules/
+npm-debug.log*
+
+# OS / editor
+Thumbs.db
+.DS_Store
+*.swp
+.vscode/

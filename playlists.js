@@ -95,6 +95,7 @@ window.PLAYLISTS = [
       { title: "Churake", artist: "Vilen x Kanika Kapoor", yt: "QpICROpBFI0" },
       { title: "Kitse", artist: "Nyn Music", yt: "ALZzTBqDvL4" },
       { title: "Malan", artist: "Sonika Singh", yt: "HG4yxlRl7Xg" },
+      { title: "Na Jaiyo", artist: "Preet Sirohi", yt: "yxOrU80I4hk" },
     ]
   },
   {

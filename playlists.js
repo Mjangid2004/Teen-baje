@@ -109,6 +109,7 @@ window.PLAYLISTS = [
       { title: "California Love", artist: "Cheema Y", yt: "rSxTumD4kew" },
       { title: "G.O.A.T.", artist: "Diljit Dosanjh", yt: "cl0a3i2wFcc" },
       { title: "Naina", artist: "Diljit Dosanjh", yt: "3u6lLWGjFLY" },
+      { title: "Naina (Sukhwinder)", artist: "Sukhwinder Singh", yt: "OzJ-GxokeBc" },
       { title: "Excuses", artist: "AP Dhillon", yt: "vX2cDW8LUWk" },
       { title: "For A Reason", artist: "Karan Aujla", yt: "mJbSH_tucvM" },
       { title: "Jhol", artist: "Maanu", yt: "4O5sFtX4Ddk" },

@@ -2,6 +2,8 @@
 
 **Hostel Room 304 Radio.** A late-night mood web radio built to play your own music library with a rain-soaked balcony view, a spinning vinyl, and absolutely no corporate energy.
 
+> 🔴 **Listen live:** https://teen-baje.vercel.app
+
 ---
 
 ## The Idea

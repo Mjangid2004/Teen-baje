@@ -140,10 +140,13 @@
   </div>
 
   <!-- Audio Elements -->
-  <audio id="mainAudio" preload="auto"></audio>
   <audio id="rainAudio" loop preload="auto" src="assets/rain.mp3"></audio>
 
-  <script src="playlists.js?v=11"></script>
-  <script src="script.js?v=11"></script>
+  <!-- Hidden YouTube Player -->
+  <div id="ytPlayer" style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;"></div>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="playlists.js?v=12"></script>
+  <script src="script.js?v=12"></script>
 </body>
 </html>

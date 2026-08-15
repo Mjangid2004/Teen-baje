@@ -1,32 +1,52 @@
 /* ==========================================================================
-   तीन बजे (Teen Baje) - JavaScript Application Logic
+   तीन बजे (Teen Baje) - JavaScript Application Logic (YouTube Version)
    ========================================================================== */
+
+let ytPlayer = null;
+let ytReady = false;
+
+function onYouTubeIframeAPIReady() {
+  ytPlayer = new YT.Player('ytPlayer', {
+    height: '1',
+    width: '1',
+    playerVars: {
+      'autoplay': 0,
+      'controls': 0,
+      'disablekb': 1,
+      'fs': 0,
+      'modestbranding': 1,
+      'rel': 0
+    },
+    events: {
+      'onReady': function() { ytReady = true; },
+      'onStateChange': onYtStateChange
+    }
+  });
+}
+
+function onYtStateChange(event) {
+  if (event.data === YT.PlayerState.ENDED) {
+    if (window._nextTrackCallback) window._nextTrackCallback();
+  }
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   
-  // Audio Elements
-  const mainAudio = document.getElementById("mainAudio");
   const rainAudio = document.getElementById("rainAudio");
-
-  // Horizontal Player UI Elements
   const playBtn = document.getElementById("playBtn");
   const prevBtn = document.getElementById("prevBtn");
   const nextBtn = document.getElementById("nextBtn");
   const seekBar = document.getElementById("seekBar");
   const currentTimeEl = document.getElementById("currentTime");
   const durationTimeEl = document.getElementById("durationTime");
-const trackTitleEl = document.getElementById("trackTitle");
+  const trackTitleEl = document.getElementById("trackTitle");
   const artistNameEl = document.getElementById("artistName");
   const vinylDisc = document.getElementById("vinylDisc");
   const musicVol = document.getElementById("musicVol");
   const rainVol = document.getElementById("rainVol");
   const playlistTabsContainer = document.getElementById("playlistTabs");
-
-  // Window Rain Controls
   const windowRainToggleBtn = document.getElementById("windowRainToggleBtn");
   const windowRainStatus = document.getElementById("windowRainStatus");
-
-  // Header & Modal Elements
   const quoteTicker = document.getElementById("quoteTicker");
   const listenerCountEl = document.getElementById("listenerCount");
   const toggleTracklistBtn = document.getElementById("toggleTracklistBtn");
@@ -35,17 +55,19 @@ const trackTitleEl = document.getElementById("trackTitle");
   const trackListUl = document.getElementById("trackList");
   const currentPlaylistNameEl = document.getElementById("currentPlaylistName");
 
-  // State Variables
   let currentPlaylistIndex = 0;
   let currentTrackIndex = 0;
   let isPlaying = false;
   let isRainPlaying = false;
   let currentQuoteIndex = 0;
+  let seekInterval = null;
 
-  // Real Active Visitor Tracker using BroadcastChannel & localStorage
   initRealOnlineCounter();
 
-  // Initialize Playlists & Tabs
+  window._nextTrackCallback = function() {
+    nextTrack();
+  };
+
   function initPlaylists() {
     playlistTabsContainer.innerHTML = "";
     window.PLAYLISTS.forEach((pl, idx) => {
@@ -58,67 +80,83 @@ const trackTitleEl = document.getElementById("trackTitle");
     loadTrack(currentPlaylistIndex, currentTrackIndex);
   }
 
-  // Select Playlist
   function selectPlaylist(index) {
     currentPlaylistIndex = index;
     currentTrackIndex = 0;
-    
     const tabs = playlistTabsContainer.querySelectorAll(".playlist-tab-btn");
-    tabs.forEach((tab, idx) => {
-      tab.classList.toggle("active", idx === index);
-    });
-
+    tabs.forEach((tab, idx) => tab.classList.toggle("active", idx === index));
     loadTrack(currentPlaylistIndex, currentTrackIndex);
     if (isPlaying) playAudio();
   }
 
-  // Load Track & Buffer Audio smoothly
   function loadTrack(playlistIdx, trackIdx) {
     const playlist = window.PLAYLISTS[playlistIdx];
     const track = playlist.tracks[trackIdx];
-
     currentPlaylistNameEl.innerText = playlist.name;
     trackTitleEl.innerText = track.title;
     artistNameEl.innerText = track.artist;
-    
-    // Set Audio Source & preload metadata
-    mainAudio.src = track.url;
-    mainAudio.load();
-
     seekBar.value = 0;
     currentTimeEl.innerText = "0:00";
     durationTimeEl.innerText = track.duration || "3:30";
-
     renderModalTracklist();
   }
 
-  // Play / Pause Logic
   function togglePlay() {
-    if (isPlaying) {
-      pauseAudio();
-    } else {
-      playAudio();
-    }
+    if (isPlaying) pauseAudio();
+    else playAudio();
   }
 
   function playAudio() {
-    mainAudio.play().then(() => {
-isPlaying = true;
-      playBtn.innerText = "⏸️";
-      vinylDisc.classList.add("spinning");
-    }).catch(err => {
-      console.log("Autoplay check:", err);
-    });
+    if (!ytReady || !ytPlayer) {
+      console.log("YouTube player not ready yet");
+      return;
+    }
+    const playlist = window.PLAYLISTS[currentPlaylistIndex];
+    const track = playlist.tracks[currentTrackIndex];
+    
+    if (track.yt !== window._currentYtId) {
+      ytPlayer.loadVideoById(track.yt);
+      window._currentYtId = track.yt;
+    } else {
+      ytPlayer.playVideo();
+    }
+    
+    isPlaying = true;
+    playBtn.innerText = "⏸️";
+    vinylDisc.classList.add("spinning");
+    startTimeUpdate();
   }
 
   function pauseAudio() {
-    mainAudio.pause();
-isPlaying = false;
+    if (ytPlayer) ytPlayer.pauseVideo();
+    isPlaying = false;
     playBtn.innerText = "▶️";
     vinylDisc.classList.remove("spinning");
+    stopTimeUpdate();
   }
 
-  // Next & Previous Track
+  function startTimeUpdate() {
+    stopTimeUpdate();
+    seekInterval = setInterval(() => {
+      if (ytPlayer && ytPlayer.getCurrentTime) {
+        const current = ytPlayer.getCurrentTime();
+        const duration = ytPlayer.getDuration();
+        if (duration > 0) {
+          seekBar.value = (current / duration) * 100;
+          currentTimeEl.innerText = formatTime(current);
+          durationTimeEl.innerText = formatTime(duration);
+        }
+      }
+    }, 500);
+  }
+
+  function stopTimeUpdate() {
+    if (seekInterval) {
+      clearInterval(seekInterval);
+      seekInterval = null;
+    }
+  }
+
   function nextTrack() {
     const playlist = window.PLAYLISTS[currentPlaylistIndex];
     currentTrackIndex = (currentTrackIndex + 1) % playlist.tracks.length;
@@ -133,7 +171,6 @@ isPlaying = false;
     if (isPlaying) playAudio();
   }
 
-  // Toggle Window Rain Ambient Sound
   function setRainState(on) {
     if (on) {
       rainAudio.volume = rainVol.value;
@@ -155,7 +192,6 @@ isPlaying = false;
     try { localStorage.setItem("teen_baje_rain", next ? "on" : "off"); } catch (e) {}
   }
 
-  // Restore rain preference (default ON) & auto-start, with autoplay fallback
   function initRainState() {
     let saved = "on";
     try {
@@ -174,47 +210,30 @@ isPlaying = false;
     }
   }
 
-// Smooth Seeking Track Progress Bar
   let isSeeking = false;
 
-  mainAudio.addEventListener("timeupdate", () => {
-    if (isSeeking) return;
-    if (mainAudio.duration && !isNaN(mainAudio.duration)) {
-      const progress = (mainAudio.currentTime / mainAudio.duration) * 100;
-      seekBar.value = progress;
-      currentTimeEl.innerText = formatTime(mainAudio.currentTime);
-      durationTimeEl.innerText = formatTime(mainAudio.duration);
-    }
-  });
-
-  mainAudio.addEventListener("ended", () => {
-    nextTrack();
-  });
-
-  // Precise seeking: update thumb + time while dragging, apply on release
   seekBar.addEventListener("input", () => {
     isSeeking = true;
-    if (mainAudio.duration && !isNaN(mainAudio.duration)) {
-      currentTimeEl.innerText = formatTime((seekBar.value / 100) * mainAudio.duration);
+    if (ytPlayer && ytPlayer.getDuration) {
+      const duration = ytPlayer.getDuration();
+      if (duration > 0) {
+        currentTimeEl.innerText = formatTime((seekBar.value / 100) * duration);
+      }
     }
   });
 
   seekBar.addEventListener("change", () => {
-    if (mainAudio.duration && !isNaN(mainAudio.duration)) {
-      mainAudio.currentTime = (seekBar.value / 100) * mainAudio.duration;
+    if (ytPlayer && ytPlayer.getDuration) {
+      const duration = ytPlayer.getDuration();
+      if (duration > 0) {
+        ytPlayer.seekTo((seekBar.value / 100) * duration, true);
+      }
     }
     isSeeking = false;
   });
 
-  mainAudio.addEventListener("loadedmetadata", () => {
-    seekBar.value = 0;
-    currentTimeEl.innerText = "0:00";
-    durationTimeEl.innerText = formatTime(mainAudio.duration);
-  });
-
-// Volume Control
   musicVol.addEventListener("input", () => {
-    mainAudio.volume = musicVol.value;
+    if (ytPlayer) ytPlayer.setVolume(musicVol.value * 100);
   });
 
   rainVol.addEventListener("input", () => {
@@ -228,11 +247,9 @@ isPlaying = false;
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   }
 
-  // Render Tracklist Drawer
   function renderModalTracklist() {
     trackListUl.innerHTML = "";
     const playlist = window.PLAYLISTS[currentPlaylistIndex];
-
     playlist.tracks.forEach((t, idx) => {
       const li = document.createElement("li");
       li.className = `track-li ${idx === currentTrackIndex ? "active" : ""}`;
@@ -253,7 +270,6 @@ isPlaying = false;
     });
   }
 
-  // Real Active Tab/User Online Counter Logic
   function initRealOnlineCounter() {
     const channel = new BroadcastChannel("teen_baje_online");
     const myId = Math.random().toString(36).substring(2, 9);
@@ -283,7 +299,6 @@ isPlaying = false;
     updateDisplayCount();
   }
 
-// Auto-rotating Quotes Ticker
   const quoteRefreshBtn = document.getElementById("quoteRefreshBtn");
 
   function showNextQuote() {
@@ -298,35 +313,25 @@ isPlaying = false;
   setInterval(showNextQuote, 9000);
   quoteRefreshBtn.addEventListener("click", showNextQuote);
 
-  // Keyboard Event Shortcuts
   document.addEventListener("keydown", (e) => {
-    if (e.code === "Space") {
-      e.preventDefault();
-      togglePlay();
-    } else if (e.code === "KeyN") {
-      nextTrack();
-    } else if (e.code === "KeyP") {
-      prevTrack();
-    } else if (e.code === "KeyR") {
-      toggleWindowRain();
-    }
+    if (e.code === "Space") { e.preventDefault(); togglePlay(); }
+    else if (e.code === "KeyN") nextTrack();
+    else if (e.code === "KeyP") prevTrack();
+    else if (e.code === "KeyR") toggleWindowRain();
   });
 
-  // Modal & Controls Event Handlers
   toggleTracklistBtn.addEventListener("click", () => tracklistModal.classList.add("open"));
   closeModalBtn.addEventListener("click", () => tracklistModal.classList.remove("open"));
-
   playBtn.addEventListener("click", togglePlay);
   prevBtn.addEventListener("click", prevTrack);
   nextBtn.addEventListener("click", nextTrack);
   windowRainToggleBtn.addEventListener("click", toggleWindowRain);
 
-initWindowRainCanvas();
+  initWindowRainCanvas();
   initRainState();
   initPlaylists();
 });
 
-/* Canvas Rain Engine - Confined strictly to Window Box */
 function initWindowRainCanvas() {
   const container = document.getElementById("windowRainBox");
   const canvas = document.getElementById("rainCanvas");

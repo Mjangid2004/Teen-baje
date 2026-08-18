@@ -18,6 +18,7 @@ window.PLAYLISTS = [
       { title: "BROTHERHOOD", artist: "Naveen Chaudhary", yt: "u45Up6j6mlU" },
       { title: "Chambal K Dakku", artist: "Masoom Sharma", yt: "LzrPO12JNM0" },
       { title: "Chora Haryane Aala", artist: "Eshan Sunny", yt: "gRwDNOySkiY" },
+      { title: "Chetak", artist: "Sapna Choudhary", yt: "UZjPQ-r5LyA" },
       { title: "Convoy", artist: "Khasa Aala Chahar", yt: "K_sCoyw6fGg" },
       { title: "Knife Brows", artist: "Dhanda Nyoliwala", yt: "LGz6ibOkeqQ" },
       { title: "Not Guilty", artist: "Dhanda Nyoliwala", yt: "E7ergOnpO1Q" },

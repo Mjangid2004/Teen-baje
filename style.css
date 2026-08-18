@@ -189,6 +189,70 @@ body, html {
 }
 
 /* ==========================================================================
+   SECRET SCENE PICKER (hidden in coffee cup)
+   ========================================================================== */
+.scene-hotspot {
+  position: absolute;
+  bottom: 24%;
+  left: 58.5%;
+  width: 24px;
+  height: 24px;
+  margin-left: -12px;
+  z-index: 5;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  opacity: 0;
+}
+.scene-hotspot:active { opacity: 0.4; }
+
+.scene-menu {
+  display: none;
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 220;
+  background: rgba(22, 24, 32, 0.95);
+  border: 1px solid rgba(255, 183, 3, 0.4);
+  border-radius: 16px;
+  padding: 12px 14px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+}
+.scene-menu.open { display: block; }
+
+.scene-menu-title {
+  color: #ffb703;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.scene-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.scene-opt {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.85);
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.scene-opt:hover { background: #ffb703; color: #111; }
+.scene-opt.scene-active { background: #ffb703; color: #111; }
+
+/* ==========================================================================
    TOP BAR
    ========================================================================== */
 .top-bar {

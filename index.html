@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=13">
+  <link rel="stylesheet" href="style.css?v=14">
 </head>
 <body>
 
@@ -40,6 +40,24 @@
     </div>
     <div class="steam-container cup2-steam">
       <span></span><span></span><span></span>
+    </div>
+
+    <!-- Secret Scene Hotspot (hidden in the coffee cup) -->
+    <button class="scene-hotspot" id="sceneHotspot" aria-label=""></button>
+
+    <!-- Secret Scene Menu -->
+    <div class="scene-menu" id="sceneMenu">
+      <div class="scene-menu-title">🌙 mood</div>
+      <div class="scene-menu-grid">
+        <button class="scene-opt" data-scene="auto">Auto</button>
+        <button class="scene-opt" data-scene="clear">Clear</button>
+        <button class="scene-opt" data-scene="cloudy">Clouds</button>
+        <button class="scene-opt" data-scene="foggy">Fog</button>
+        <button class="scene-opt" data-scene="drizzle">Drizzle</button>
+        <button class="scene-opt" data-scene="rain">Rain</button>
+        <button class="scene-opt" data-scene="storm">Storm</button>
+        <button class="scene-opt" data-scene="night">Night</button>
+      </div>
     </div>
 
     <!-- Lamp Warm Flicker Glow Overlay -->
@@ -163,6 +181,6 @@
 
   <script src="https://www.youtube.com/iframe_api"></script>
   <script src="playlists.js?v=20"></script>
-  <script src="script.js?v=24"></script>
+  <script src="script.js?v=25"></script>
 </body>
 </html>

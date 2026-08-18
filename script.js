@@ -344,6 +344,8 @@ document.addEventListener("DOMContentLoaded", () => {
   nextBtn.addEventListener("click", nextTrack);
   windowRainToggleBtn.addEventListener("click", toggleWindowRain);
 
+  initSecretScenePicker();
+
   initWindowRainCanvas();
   initRainState();
   initPlaylists();
@@ -359,6 +361,44 @@ const WEATHER_BG = {
   storm: "assets/bg-storm.png",
   night: "assets/bg-night.png"
 };
+
+function initSecretScenePicker() {
+  const hotspot = document.getElementById("sceneHotspot");
+  const menu = document.getElementById("sceneMenu");
+  if (!hotspot || !menu) return;
+
+  function highlight() {
+    const cur = localStorage.getItem("tb_scene") || "auto";
+    menu.querySelectorAll(".scene-opt").forEach((b) => {
+      b.classList.toggle("scene-active", b.dataset.scene === cur);
+    });
+  }
+
+  hotspot.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isOpen = menu.classList.toggle("open");
+    if (isOpen) highlight();
+  });
+
+  menu.addEventListener("click", (e) => {
+    const opt = e.target.closest(".scene-opt");
+    if (!opt) return;
+    const scene = opt.dataset.scene;
+    if (scene === "auto") {
+      localStorage.removeItem("tb_scene");
+      applyWeatherBackground(weatherKeyFromCode(0, true, 0));
+      setTimeout(initWeatherBackground, 50);
+    } else {
+      localStorage.setItem("tb_scene", scene);
+      applyWeatherBackground(scene);
+    }
+    highlight();
+    menu.classList.remove("open");
+    e.stopPropagation();
+  });
+
+  document.addEventListener("click", () => menu.classList.remove("open"));
+}
 
 function weatherKeyFromCode(code, isDay, cloudCover) {
   if (code <= 1) {
@@ -396,6 +436,16 @@ function applyWeatherBackground(key) {
 function initWeatherBackground() {
   const DEFAULT_LOC = { lat: 28.62137, lon: 77.2148 };
   const choice = localStorage.getItem("tb_loc_choice");
+  const override = localStorage.getItem("tb_scene");
+
+  if (override && WEATHER_BG[override]) {
+    console.log("Scene override active:", override);
+    applyWeatherBackground(override);
+    if (!initWeatherBackground._timer) {
+      initWeatherBackground._timer = setInterval(initWeatherBackground, 30 * 60 * 1000);
+    }
+    return;
+  }
 
   function fetchWeather(lat, lon) {
     return fetch(

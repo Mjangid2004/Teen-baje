@@ -419,6 +419,7 @@ function applyWeatherBackground(key) {
   const base = document.getElementById("bgLayerA");
   const fade = document.getElementById("bgLayerB");
   const img = WEATHER_BG[key] || WEATHER_BG.night;
+  if (window.setSceneRain) window.setSceneRain(key);
   fade.style.backgroundImage = "url('" + img + "')";
 
   void fade.offsetWidth;
@@ -546,39 +547,71 @@ function initWindowRainCanvas() {
   window.addEventListener("resize", resizeCanvas);
   resizeCanvas();
 
-  const raindrops = [];
-  const maxDrops = 100;
+  const PRESETS = {
+    none: { count: 0, minLen: 0, lenVar: 0, minSpeed: 0, speedVar: 0, lineWidth: 0, maxOpacity: 0, minOpacity: 0 },
+    drizzle: {
+      count: 40,
+      minLen: 4,
+      lenVar: 5,
+      minSpeed: 3,
+      speedVar: 2,
+      lineWidth: 0.7,
+      maxOpacity: 0.35,
+      minOpacity: 0.12
+    },
+    rain: {
+      count: 100,
+      minLen: 8,
+      lenVar: 18,
+      minSpeed: 4,
+      speedVar: 6,
+      lineWidth: 1.3,
+      maxOpacity: 0.5,
+      minOpacity: 0.2
+    }
+  };
 
-  for (let i = 0; i < maxDrops; i++) {
-    raindrops.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      length: Math.random() * 18 + 8,
-      speed: Math.random() * 6 + 4,
-      opacity: Math.random() * 0.5 + 0.2
-    });
+  let raindrops = [];
+  let mode = "none";
+
+  function buildDrops(preset) {
+    raindrops = [];
+    for (let i = 0; i < preset.count; i++) {
+      raindrops.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        length: preset.minLen + Math.random() * preset.lenVar,
+        speed: preset.minSpeed + Math.random() * preset.speedVar,
+        opacity: preset.minOpacity + Math.random() * (preset.maxOpacity - preset.minOpacity)
+      });
+    }
   }
+
+  window.setSceneRain = function (key) {
+    mode = key === "rain" || key === "storm" ? "rain" : key === "drizzle" ? "drizzle" : "none";
+    buildDrops(PRESETS[mode]);
+  };
+  buildDrops(PRESETS.none);
 
   function renderRain() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = "rgba(186, 230, 253, 0.6)";
-    ctx.lineWidth = 1.3;
-
-    raindrops.forEach(drop => {
-      ctx.beginPath();
-      ctx.moveTo(drop.x, drop.y);
-      ctx.lineTo(drop.x - 2, drop.y + drop.length);
-      ctx.stroke();
-
-      drop.y += drop.speed;
-      drop.x -= 0.4;
-
-      if (drop.y > canvas.height) {
-        drop.y = -15;
-        drop.x = Math.random() * canvas.width;
-      }
-    });
-
+    const preset = PRESETS[mode];
+    if (mode !== "none") {
+      ctx.strokeStyle = "rgba(186, 230, 253, 0.6)";
+      ctx.lineWidth = preset.lineWidth;
+      raindrops.forEach((drop) => {
+        ctx.beginPath();
+        ctx.moveTo(drop.x, drop.y);
+        ctx.lineTo(drop.x - 2, drop.y + drop.length);
+        ctx.stroke();
+        drop.y += drop.speed;
+        drop.x -= 0.4;
+        if (drop.y > canvas.height) {
+          drop.y = -15;
+          drop.x = Math.random() * canvas.width;
+        }
+      });
+    }
     requestAnimationFrame(renderRain);
   }
 

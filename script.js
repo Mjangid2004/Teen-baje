@@ -347,8 +347,72 @@ document.addEventListener("DOMContentLoaded", () => {
   initWindowRainCanvas();
   initRainState();
   initPlaylists();
+  initWeatherBackground();
 });
 
+const WEATHER_BG = {
+  clear: "assets/bg-clear.png",
+  cloudy: "assets/bg-cloudy.png",
+  foggy: "assets/bg-foggy.png",
+  drizzle: "assets/bg-drizzle.png",
+  rain: "assets/bg-rain.png",
+  storm: "assets/bg-storm.png",
+  night: "assets/bg-night.png"
+};
+
+function weatherKeyFromCode(code, isDay) {
+  if (code <= 1) return isDay ? "clear" : "night";
+  if (code <= 3) return "cloudy";
+  if (code === 45 || code === 48) return "foggy";
+  if (code <= 57) return "drizzle";
+  if (code <= 67) return "rain";
+  if (code <= 77) return "foggy";
+  if (code <= 82) return code === 82 ? "storm" : "rain";
+  if (code <= 86) return "cloudy";
+  return "storm";
+}
+
+function applyWeatherBackground(key) {
+  const base = document.getElementById("bgLayerA");
+  const fade = document.getElementById("bgLayerB");
+  const img = WEATHER_BG[key] || WEATHER_BG.night;
+  fade.style.backgroundImage = "url('" + img + "')";
+
+  void fade.offsetWidth;
+  fade.classList.add("show");
+  fade.addEventListener(
+    "transitionend",
+    () => {
+      base.style.backgroundImage = "url('" + img + "')";
+      fade.classList.remove("show");
+    },
+    { once: true }
+  );
+}
+
+function initWeatherBackground() {
+  fetch("https://ipapi.co/json/", { signal: AbortSignal.timeout(8000) })
+    .then((r) => r.json())
+    .then((loc) => {
+      return fetch(
+        "https://api.open-meteo.com/v1/forecast?latitude=" +
+          loc.latitude +
+          "&longitude=" +
+          loc.longitude +
+          "&current=weather_code,is_day&timezone=auto",
+        { signal: AbortSignal.timeout(8000) }
+      );
+    })
+    .then((r) => r.json())
+    .then((data) => {
+      if (data && data.current) {
+        const key = weatherKeyFromCode(data.current.weather_code, data.current.is_day === 1);
+        applyWeatherBackground(key);
+      }
+    })
+    .catch(() => {});
+  setInterval(initWeatherBackground, 30 * 60 * 1000);
+}
 function initWindowRainCanvas() {
   const container = document.getElementById("windowRainBox");
   const canvas = document.getElementById("rainCanvas");

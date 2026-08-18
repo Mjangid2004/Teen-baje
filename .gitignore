@@ -1,6 +1,9 @@
 # Local music source lives on OneDrive via a junction - never commit it
 /music/
 
+# Generated/working images kept out of the repo
+/Static images/
+
 # Node
 node_modules/
 npm-debug.log*

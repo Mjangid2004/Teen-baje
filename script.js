@@ -283,7 +283,14 @@ document.addEventListener("DOMContentLoaded", () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: visitorId }),
-      }).catch(() => {});
+      })
+        .then((r) => (r.ok ? r.json() : Promise.reject()))
+        .then((data) => {
+          if (data && typeof data.count === "number") {
+            listenerCountEl.innerText = data.count.toLocaleString();
+          }
+        })
+        .catch(() => {});
     }
 
     function refreshCount() {
@@ -298,9 +305,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     heartbeat();
-    refreshCount();
-    setInterval(heartbeat, 25000);
-    setInterval(refreshCount, 10000);
+    setInterval(heartbeat, 10000);
+    setInterval(refreshCount, 30000);
+
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) {
+        heartbeat();
+        refreshCount();
+      }
+    });
   }
 
   const quoteRefreshBtn = document.getElementById("quoteRefreshBtn");

@@ -60,9 +60,9 @@ body, html {
 .window-rain-box {
   position: absolute;
   top: 2%;
-  left: 52%;
-  width: 25%;
-  height: 50%;
+  left: 50%;
+  width: 30%;
+  height: 56%;
   border-radius: 12px;
   overflow: hidden;
   z-index: 2;
@@ -917,7 +917,7 @@ body, html {
   .vinyl-disc { width: 42px; height: 42px; }
   .vinyl-label { width: 22px; height: 22px; }
   .quote-ticker-wrapper { display: none; }
-  .window-rain-box { width: 50%; height: 50%; left: 48%; }
+  .window-rain-box { width: 55%; height: 55%; left: 45%; }
   .modal-content { width: calc(100% - 24px); max-height: calc(100dvh - 120px); }
   .tracklist-modal { align-items: center; }
 }

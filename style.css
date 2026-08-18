@@ -211,10 +211,10 @@ body, html {
 /* Lightning Flash Overlay (bigger than window: +30% sides & bottom) */
 .lightning-flash {
   position: absolute;
-  top: 2%;
-  left: 46.65%;
-  width: 37.7%;
-  height: 78%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   z-index: 3;
   pointer-events: none;
   background: #ffffff;

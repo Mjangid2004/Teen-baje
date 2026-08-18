@@ -27,14 +27,14 @@ These sites prove one thing — you don't need a framework platoon, an analytics
 
 ## What It Does
 
-- 📻 **Plays your own music** — drop your MP3s in, five curated playlists appear as tactile tabs (the exact playlists are yours to edit — swap them anytime).
+- 📻 **Streams curated playlists** — four playlists of Haryanvi, Punjabi & Hindi tracks, streamed straight from official YouTube videos (the playlists are yours to edit — swap them anytime).
 - 💿 **A spinning vinyl** that rotates along with the currently playing track.
 - 🎚️ **Draggable seek bar** with live timestamps — jump to any second of the song.
 - 🌧️ **Rain outside the window** — a canvas rain animation confined to the balcony window, with a real audio loop of rain and thunder playing on top.
 - 🔊 **Two independent volume sliders** — one for the music, one for the rain.
 - 💭 **A soft quote ticker** slowly pacing the room's mood, with a manual refresh button when you need a new one.
 - 🛡️ **Rain remembers you** — rain state persists across visits and refreshes (`localStorage`), defaulting to ON.
-- 🖼️ **A fullscreen scene** — a cozy desi-living-room backdrop with steam rising from chai cups, a flickering lamp glow, and a live "engineers awake" online counter.
+- 🖼️ **A fullscreen scene** — a cozy desi-living-room backdrop with steam rising from chai cups, a flickering lamp glow, and a **real "engineers awake" counter** showing actual live visitors (via a serverless API + Postgres — not a fake static number).
 
 ---
 
@@ -51,15 +51,19 @@ Highlights of how the fiddly parts got solved:
 | Browser cache fighting us | Versioned asset URLs (`?v=n`) — bumped after every change so stale files never linger. |
 | Rain from a dead link | The original rain sound 404'd; pulled a fresh ~8-hour "rain on window with thunder" loop from YouTube, trimmed to a tidy 10-minute seamless loop with **ffmpeg**. |
 | Dragging vs. auto-updating seek | A `change`-only-apply pattern with an `isSeeking` flag so the `timeupdate` handler doesn't fight your thumb mid-drag. |
-| Music served from OneDrive | A directory junction (`music → OneDrive/Music/Playlists`) lets the site stream real local MP3s without copying GBs into the repo. |
+| Hosting your own music | Free hosts don't stream MP3s reliably, so playback switched to **official YouTube embeds** — no audio hosting needed at all. |
+| Fake "online" counter | Was `BroadcastChannel` (only counted *your own* open tabs). Rebuilt as a real **serverless API + Neon Postgres** counter: each visitor heartbeats their unique ID every 25s, stale users expire after 90s, and the count updates live. |
 
 ### Stack
 
 ```
-HTML  — semantic, single page
-CSS   — hand-written, gold-on-dark radio-room aesthetic
-JS    — zero dependencies (existing replays at 69 tracks and counting, all local)
-Node  — server.js, a ~50-line static server with HTTP Range support
+HTML   — semantic, single page
+CSS    — hand-written, gold-on-dark radio-room aesthetic
+JS     — zero front-end dependencies; YouTube IFrame API for playback
+Node   — server.js, a tiny static server with HTTP Range support (local dev only)
+API    — api/online.js, a Vercel serverless function
+DB     — Neon Postgres (Vercel Storage), stores live visitor IDs
+Host   — Vercel (static + serverless), auto-deploys on push to `master`
 ```
 
 ### Run it locally
@@ -68,6 +72,8 @@ Node  — server.js, a ~50-line static server with HTTP Range support
 node server.js
 # → http://localhost:8000
 ```
+
+> Note: the live counter needs Vercel + Postgres, so it stays at the default value on `localhost`.
 
 That's it. Open the URL, press play, watch it rain.
 
@@ -79,13 +85,15 @@ That's it. Open the URL, press play, watch it rain.
 teen-baje/
 ├── index.html      # the page
 ├── style.css       # the whole look, by hand
-├── script.js       # playback, seeking, rain, quotes, tabs
+├── script.js       # playback, seeking, rain, quotes, tabs, live counter
 ├── playlists.js    # your playlists & quotes (edit freely)
-├── server.js       # tiny static server with Range support
-├── assets/
-│   ├── background.png   # the room scene
-│   └── rain.mp3         # 10-min seamless rain + thunder loop
-└── music/               # junction → your local MP3 library
+├── server.js       # tiny static server with Range support (local dev only)
+├── api/
+│   └── online.js   # Vercel serverless function → live visitor count
+├── package.json    # postgres.js dependency for the API
+└── assets/
+    ├── background.png   # the room scene
+    └── rain.mp3         # 10-min seamless rain + thunder loop
 ```
 
 ---
@@ -96,9 +104,9 @@ teen-baje/
 
 **Why "तीन बजे"?** 3 AM. When the code finally compiles, the chai's finally done, and the rain is still going.
 
-**Can I change the playlists?** Yes — edit `playlists.js`. Track files are referenced by name, so point any entry at any MP3 you have. The playlist names, order, and genre tags are fully yours to reshape.
+**Can I change the playlists?** Yes — edit `playlists.js`. Each song is a YouTube video ID (`yt`), so point any entry at any song you like. The playlist names, order, and genre tags are fully yours to reshape. Once you bump `playlists.js?v=` in `index.html`, commit, and push — Vercel redeploys automatically.
 
-**Where do the MP3s live?** Outside the repo, in your own music folder, linked in via a junction so streaming stays dead-simple and near-zero-latency.
+**Where does the music come from?** Straight from official YouTube videos — so there's no audio hosting, bandwidth limits, or gigabytes buried in the repo.
 
 ---
 

@@ -186,7 +186,7 @@ body, html {
   100% { transform: translateY(-55px) scaleX(2.5); opacity: 0; }
 }
 
-/* Lightning Flash Overlay */
+/* Lightning Flash Overlay (confined to window box) */
 .lightning-flash {
   position: absolute;
   top: 0;
@@ -197,17 +197,18 @@ body, html {
   pointer-events: none;
   background: #ffffff;
   opacity: 0;
+  border-radius: 12px;
 }
 .lightning-flash.flashing {
-  animation: lightningBolt 0.45s ease-out;
+  animation: lightningBolt 0.5s ease-out;
 }
 @keyframes lightningBolt {
   0% { opacity: 0; }
-  10% { opacity: 0.9; }
-  25% { opacity: 0.2; }
-  40% { opacity: 0.75; }
-  60% { opacity: 0.05; }
-  80% { opacity: 0.5; }
+  10% { opacity: 0.65; }
+  25% { opacity: 0.15; }
+  40% { opacity: 0.5; }
+  60% { opacity: 0.04; }
+  80% { opacity: 0.35; }
   100% { opacity: 0; }
 }
 

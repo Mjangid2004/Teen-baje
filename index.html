@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=21">
+  <link rel="stylesheet" href="style.css?v=22">
 </head>
 <body>
 
@@ -21,6 +21,9 @@
     <div class="window-rain-box" id="windowRainBox">
       <canvas id="rainCanvas"></canvas>
 
+      <!-- Lightning Flash Overlay (storm scenes) -->
+      <div class="lightning-flash" id="lightningFlash"></div>
+
       <!-- Window Rain Toggle Button inside window frame -->
       <div class="rain-switch-overlay">
         <button id="windowRainToggleBtn" class="rain-switch-btn" title="Toggle Natural Rain Sound">
@@ -30,9 +33,6 @@
         </button>
       </div>
     </div>
-
-    <!-- Lightning Flash Overlay (storm scenes) -->
-    <div class="lightning-flash" id="lightningFlash"></div>
 
     <!-- Steam Effect Overlays over Chai Cup -->
     <div class="steam-container cup1-steam">
@@ -178,6 +178,6 @@
 
   <script src="https://www.youtube.com/iframe_api"></script>
   <script src="playlists.js?v=20"></script>
-  <script src="script.js?v=33"></script>
+  <script src="script.js?v=34"></script>
 </body>
 </html>

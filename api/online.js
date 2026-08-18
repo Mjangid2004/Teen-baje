@@ -1,6 +1,6 @@
 const postgres = require("postgres");
 
-const STALE_AFTER_MS = 30000;
+const STALE_AFTER_MS = 90000;
 
 const connectionString =
   process.env.STORAGE_URL ||

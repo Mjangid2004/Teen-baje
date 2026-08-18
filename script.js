@@ -305,7 +305,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     heartbeat();
-    setInterval(heartbeat, 10000);
+    setInterval(heartbeat, 25000);
     setInterval(refreshCount, 30000);
 
     document.addEventListener("visibilitychange", () => {

@@ -164,14 +164,12 @@ body, html {
   gap: 6px;
 }
 
-.kettle-steam { bottom: 30%; left: 51%; }
-.cup1-steam { bottom: 25%; left: 54.5%; }
-.cup2-steam { bottom: 25%; left: 58.5%; }
+.cup1-steam { bottom: 34%; left: 52%; }
 
 .steam-container span {
-  width: 6px;
-  height: 40px;
-  background: linear-gradient(to top, rgba(255,255,255,0.4), rgba(255,255,255,0.0));
+  width: 7px;
+  height: 46px;
+  background: linear-gradient(to top, rgba(255,255,255,0.6), rgba(255,255,255,0.0));
   border-radius: 10px;
   filter: blur(4px);
   animation: steamRise 3s infinite linear;
@@ -184,8 +182,8 @@ body, html {
 
 @keyframes steamRise {
   0% { transform: translateY(0) scaleX(1); opacity: 0; }
-  30% { opacity: 0.6; }
-  100% { transform: translateY(-45px) scaleX(2.5); opacity: 0; }
+  30% { opacity: 0.85; }
+  100% { transform: translateY(-55px) scaleX(2.5); opacity: 0; }
 }
 
 /* Lightning Flash Overlay */

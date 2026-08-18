@@ -30,11 +30,12 @@ These sites prove one thing — you don't need a framework platoon, an analytics
 - 📻 **Streams curated playlists** — four playlists of Haryanvi, Punjabi & Hindi tracks, streamed straight from official YouTube videos (the playlists are yours to edit — swap them anytime).
 - 💿 **A spinning vinyl** that rotates along with the currently playing track.
 - 🎚️ **Draggable seek bar** with live timestamps — jump to any second of the song.
-- 🌧️ **Rain outside the window** — a canvas rain animation confined to the balcony window, with a real audio loop of rain and thunder playing on top.
+- 🌧️ **Rain outside the window** — a canvas rain animation confined to the balcony window, with a real audio loop of rain and thunder playing on top. The rain is **scene-aware**: full streaks in rain, lighter streaks in drizzle, and a heavier downpour with random lightning flashes in a storm.
 - 🔊 **Two independent volume sliders** — one for the music, one for the rain.
 - 💭 **A soft quote ticker** slowly pacing the room's mood, with a manual refresh button when you need a new one.
 - 🛡️ **Rain remembers you** — rain state persists across visits and refreshes (`localStorage`), defaulting to ON.
-- 🖼️ **A fullscreen scene** — a cozy desi-living-room backdrop with steam rising from chai cups, a flickering lamp glow, and a **real "engineers awake" counter** showing actual live visitors (via a serverless API + Postgres — not a fake static number).
+- 🖼️ **Weather-reactive scene** — the room backdrop automatically matches the **live weather outside your window**. It asks for your location (GPS when granted, IP-based city as fallback), then swaps between clear / cloudy / foggy / drizzle / rainy / storm / night backgrounds. Steam rises from the chai cup no matter the weather. All artwork is generated from one base scene so the room stays consistent in every condition.
+- 🖼️ **A fullscreen scene** — a cozy desi-living-room backdrop with steam rising from the chai cup, a flickering lamp glow, and a **real "engineers awake" counter** showing actual live visitors (via a serverless API + Postgres — not a fake static number).
 
 ---
 
@@ -53,6 +54,9 @@ Highlights of how the fiddly parts got solved:
 | Dragging vs. auto-updating seek | A `change`-only-apply pattern with an `isSeeking` flag so the `timeupdate` handler doesn't fight your thumb mid-drag. |
 | Hosting your own music | Free hosts don't stream MP3s reliably, so playback switched to **official YouTube embeds** — no audio hosting needed at all. |
 | Fake "online" counter | Was `BroadcastChannel` (only counted *your own* open tabs). Rebuilt as a real **serverless API + Neon Postgres** counter: each visitor heartbeats their unique ID every 25s, stale users expire after 90s, and the count updates live. |
+| Background reacts to weather | Backdrop isn't static anymore. The page asks for GPS location (falls back to IP geolocation, then a round default), pulls the current WMO weather code + cloud cover from **Open-Meteo**, and crossfades to one of 7 generated scenes. At night, high cloud cover switches to the cloudy scene. Re-checks every 30 minutes. |
+| Rain that matches the mood | The window rain isn't one-size-fits-all: a canvas preset swaps per scene — none in clear/cloudy/foggy, thin light streaks for drizzle, normal streaks for rain, and a denser downpour **with random lightning flashes** for storms. |
+| Browsers hiding the controls | Phones overlap the app with their toolbar, covering the bottom bar. Fixed with `100dvh` (dynamic viewport height), `safe-area-inset-bottom` padding, and `viewport-fit=cover`, so the queue button and player clear the browser chrome on mobile. |
 
 ### Stack
 
@@ -85,15 +89,22 @@ That's it. Open the URL, press play, watch it rain.
 teen-baje/
 ├── index.html      # the page
 ├── style.css       # the whole look, by hand
-├── script.js       # playback, seeking, rain, quotes, tabs, live counter
+├── script.js       # playback, seeking, rain, lightning, weather scene, quotes, live counter
 ├── playlists.js    # your playlists & quotes (edit freely)
 ├── server.js       # tiny static server with Range support (local dev only)
 ├── api/
 │   └── online.js   # Vercel serverless function → live visitor count
 ├── package.json    # postgres.js dependency for the API
 └── assets/
-    ├── background.png   # the room scene
-    └── rain.mp3         # 10-min seamless rain + thunder loop
+    ├── background.png      # default room scene (cloudy)
+    ├── bg-clear.png        # weather scenes — clear day
+    ├── bg-cloudy.png       #                       cloudy / overcast
+    ├── bg-drizzle.png      #                       light drizzle
+    ├── bg-foggy.png        #                       foggy / misty
+    ├── bg-rain.png         #                       rainy
+    ├── bg-storm.png        #                       thunderstorm (lightning)
+    ├── bg-night.png        #                       clear night
+    └── rain.mp3            # 10-min seamless rain + thunder loop
 ```
 
 ---
@@ -107,6 +118,8 @@ teen-baje/
 **Can I change the playlists?** Yes — edit `playlists.js`. Each song is a YouTube video ID (`yt`), so point any entry at any song you like. The playlist names, order, and genre tags are fully yours to reshape. Once you bump `playlists.js?v=` in `index.html`, commit, and push — Vercel redeploys automatically.
 
 **Where does the music come from?** Straight from official YouTube videos — so there's no audio hosting, bandwidth limits, or gigabytes buried in the repo.
+
+**Why does the site ask for my location?** To match the room's backdrop to the real weather around you. Granting GPS gives the most accurate scene; say "not now" and it quietly falls back to city-level IP geolocation instead. Nothing is stored — the coordinates are only used for the weather lookup.
 
 ---
 

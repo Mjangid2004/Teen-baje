@@ -60,9 +60,9 @@ body, html {
 .window-rain-box {
   position: absolute;
   top: 2%;
-  left: 50%;
-  width: 30%;
-  height: 60%;
+  left: 51%;
+  width: 29%;
+  height: 58%;
   border-radius: 12px;
   overflow: hidden;
   z-index: 2;

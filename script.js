@@ -568,11 +568,54 @@ function initWindowRainCanvas() {
       lineWidth: 1.3,
       maxOpacity: 0.5,
       minOpacity: 0.2
+    },
+    storm: {
+      count: 160,
+      minLen: 10,
+      lenVar: 22,
+      minSpeed: 5,
+      speedVar: 7,
+      lineWidth: 1.5,
+      maxOpacity: 0.65,
+      minOpacity: 0.3
     }
   };
 
   let raindrops = [];
   let mode = "none";
+  let lightningTimer = null;
+
+  function scheduleLightning() {
+    if (lightningTimer) {
+      clearTimeout(lightningTimer);
+      lightningTimer = null;
+    }
+    lightningTimer = setTimeout(() => {
+      const flash = document.getElementById("lightningFlash");
+      if (flash) {
+        flash.classList.remove("flashing");
+        void flash.offsetWidth;
+        flash.classList.add("flashing");
+      }
+      scheduleLightning();
+    }, 4000 + Math.random() * 9000);
+  }
+
+  function manageLightning(storm) {
+    if (storm) {
+      scheduleLightning();
+    } else {
+      if (lightningTimer) {
+        clearTimeout(lightningTimer);
+        lightningTimer = null;
+      }
+      const flash = document.getElementById("lightningFlash");
+      if (flash) {
+        flash.classList.remove("flashing");
+        flash.style.opacity = 0;
+      }
+    }
+  }
 
   function buildDrops(preset) {
     raindrops = [];
@@ -588,8 +631,20 @@ function initWindowRainCanvas() {
   }
 
   window.setSceneRain = function (key) {
-    mode = key === "rain" || key === "storm" ? "rain" : key === "drizzle" ? "drizzle" : "none";
-    buildDrops(PRESETS[mode]);
+    if (key === "rain") {
+      mode = "rain";
+      buildDrops(PRESETS.rain);
+    } else if (key === "storm") {
+      mode = "rain";
+      buildDrops(PRESETS.storm);
+    } else if (key === "drizzle") {
+      mode = "drizzle";
+      buildDrops(PRESETS.drizzle);
+    } else {
+      mode = "none";
+      buildDrops(PRESETS.none);
+    }
+    manageLightning(key === "storm");
   };
   buildDrops(PRESETS.none);
 

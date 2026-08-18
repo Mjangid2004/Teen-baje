@@ -1,6 +1,13 @@
-const { sql } = require("@vercel/postgres");
+const postgres = require("postgres");
 
 const STALE_AFTER_MS = 90000;
+
+const connectionString =
+  process.env.STORAGE_URL ||
+  process.env.POSTGRES_URL ||
+  process.env.DATABASE_URL;
+
+const sql = connectionString ? postgres(connectionString, { max: 1 }) : null;
 
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
@@ -10,6 +17,10 @@ module.exports = async function handler(req, res) {
     res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
     return res.status(204).end();
+  }
+
+  if (!sql) {
+    return res.status(500).json({ error: "no database configured" });
   }
 
   try {
@@ -33,8 +44,8 @@ module.exports = async function handler(req, res) {
     const staleCutoff = now - STALE_AFTER_MS;
     await sql`DELETE FROM online_users WHERE last_seen < ${staleCutoff}`;
 
-    const { rows } = await sql`SELECT COUNT(*)::int AS count FROM online_users`;
-    return res.status(200).json({ count: rows[0].count });
+    const result = await sql`SELECT COUNT(*)::int AS count FROM online_users`;
+    return res.status(200).json({ count: result[0].count });
   } catch (err) {
     console.error("online counter error:", err);
     return res.status(500).json({ error: "unavailable" });

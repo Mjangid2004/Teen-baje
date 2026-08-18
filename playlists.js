@@ -16,8 +16,9 @@ window.PLAYLISTS = [
       { title: "Bhai Bhai", artist: "Masoom Sharma", yt: "_G-Cu41dSRw" },
       { title: "BILLA SONIPAT ALA", artist: "My Definition", yt: "3DDUNpmBaDw" },
       { title: "BROTHERHOOD", artist: "Naveen Chaudhary", yt: "u45Up6j6mlU" },
-      { title: "Chambal K Dakku", artist: "Masoom Sharma", yt: "f4lJx5IufPE" },
+      { title: "Chambal K Dakku", artist: "Masoom Sharma", yt: "LzrPO12JNM0" },
       { title: "Chora Haryane Aala", artist: "Eshan Sunny", yt: "gRwDNOySkiY" },
+      { title: "Convoy", artist: "Khasa Aala Chahar", yt: "K_sCoyw6fGg" },
       { title: "Knife Brows", artist: "Dhanda Nyoliwala", yt: "LGz6ibOkeqQ" },
       { title: "Not Guilty", artist: "Dhanda Nyoliwala", yt: "E7ergOnpO1Q" },
       { title: "Russian Bandana", artist: "Dhanda Nyoliwala", yt: "1OAjeECW90E" },
@@ -28,7 +29,7 @@ window.PLAYLISTS = [
       { title: "Gundagarh", artist: "Masoom Sharma", yt: "KUF4gE1EBUE" },
       { title: "Gundey Dore Pe", artist: "Sachin Jaat", yt: "zmZ6P8SLLO4" },
       { title: "HARYANVI", artist: "Vikram Malik", yt: "AUNY8KdWIOg" },
-      { title: "Heads Up", artist: "Vikram Malik", yt: "54ctexnhzX4" },
+      { title: "Heads Up", artist: "Vikram Malik", yt: "n_aGPjmrzgo" },
       { title: "INFAMOUS", artist: "Rupesh Verma", yt: "jWrMbwtIaa0" },
       { title: "Ji Laage Se Babya Mai", artist: "Aman Jaji", yt: "vWOn08GEg7Y" },
       { title: "Kade Na Bhulegi Tu", artist: "Vinu Gaur", yt: "DS6i33S8tj0" },
@@ -95,6 +96,7 @@ window.PLAYLISTS = [
       { title: "Kitse", artist: "Nyn Music", yt: "ALZzTBqDvL4" },
       { title: "Malan", artist: "Sonika Singh", yt: "HG4yxlRl7Xg" },
       { title: "Na Jaiyo", artist: "Preet Sirohi", yt: "yxOrU80I4hk" },
+      { title: "Tu High Level Ki Chori Se", artist: "Vikash Sheoran", yt: "akMZMPT-VMA" },
     ]
   },
   {

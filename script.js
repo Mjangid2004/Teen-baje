@@ -271,32 +271,36 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function initRealOnlineCounter() {
-    const channel = new BroadcastChannel("teen_baje_online");
-    const myId = Math.random().toString(36).substring(2, 9);
-    let activePeers = new Set([myId]);
+    let visitorId = localStorage.getItem("tb_visitor_id");
+    if (!visitorId) {
+      visitorId = "v" + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+      localStorage.setItem("tb_visitor_id", visitorId);
+    }
+    const endpoint = "/api/online";
 
-    function broadcastPing() {
-      channel.postMessage({ type: "ping", id: myId });
+    function heartbeat() {
+      fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: visitorId }),
+      }).catch(() => {});
     }
 
-    channel.onmessage = (event) => {
-      if (event.data.type === "ping") {
-        activePeers.add(event.data.id);
-        channel.postMessage({ type: "pong", id: myId });
-      } else if (event.data.type === "pong") {
-        activePeers.add(event.data.id);
-      }
-      updateDisplayCount();
-    };
-
-    function updateDisplayCount() {
-      const count = Math.max(1, activePeers.size);
-      listenerCountEl.innerText = count.toLocaleString();
+    function refreshCount() {
+      fetch(endpoint)
+        .then((r) => (r.ok ? r.json() : Promise.reject()))
+        .then((data) => {
+          if (data && typeof data.count === "number") {
+            listenerCountEl.innerText = data.count.toLocaleString();
+          }
+        })
+        .catch(() => {});
     }
 
-    setInterval(broadcastPing, 3000);
-    broadcastPing();
-    updateDisplayCount();
+    heartbeat();
+    refreshCount();
+    setInterval(heartbeat, 25000);
+    setInterval(refreshCount, 10000);
   }
 
   const quoteRefreshBtn = document.getElementById("quoteRefreshBtn");

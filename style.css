@@ -206,13 +206,13 @@ body, html {
   100% { transform: translateY(-55px) scaleX(2.5); opacity: 0; }
 }
 
-/* Lightning Flash Overlay (confined to window box) */
+/* Lightning Flash Overlay (bigger than window: +30% sides & bottom) */
 .lightning-flash {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 2%;
+  left: 46.65%;
+  width: 37.7%;
+  height: 78%;
   z-index: 3;
   pointer-events: none;
   background: #ffffff;

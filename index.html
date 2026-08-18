@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=11">
+  <link rel="stylesheet" href="style.css?v=12">
 </head>
 <body>
 
@@ -74,8 +74,7 @@
             <div class="vinyl-shine"></div>
             <div class="vinyl-label">
               <span class="vinyl-label-live">● LIVE</span>
-              <span class="vinyl-label-title">तीन बजे</span>
-            </div>
+<span class="vinyl-label-title">तीन बजे</span>
             <div class="vinyl-hole"></div>
           </div>
         </div>
@@ -138,6 +137,21 @@
       </div>
     </div>
 
+    <!-- Location Permission Prompt -->
+    <div class="loc-prompt" id="locPrompt">
+      <div class="loc-prompt-card">
+        <span class="loc-prompt-icon">📍</span>
+        <div class="loc-prompt-text">
+          <strong>Allow location for live weather?</strong>
+          <span>Your exact GPS location lets the background match the real weather outside your window.</span>
+        </div>
+        <div class="loc-prompt-actions">
+          <button id="locAllowBtn" class="loc-btn loc-btn-allow">Allow</button>
+          <button id="locDenyBtn" class="loc-btn loc-btn-deny">Not now</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Audio Elements -->
@@ -148,6 +162,6 @@
 
   <script src="https://www.youtube.com/iframe_api"></script>
   <script src="playlists.js?v=20"></script>
-  <script src="script.js?v=19"></script>
+  <script src="script.js?v=20"></script>
 </body>
 </html>

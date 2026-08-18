@@ -675,6 +675,96 @@ body, html {
   font-size: 11px;
 }
 
+/* Location Permission Prompt */
+.loc-prompt {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  max-width: 520px;
+  width: calc(100% - 32px);
+  background: rgba(22, 24, 32, 0.92);
+  border: 1px solid rgba(255, 183, 3, 0.4);
+  border-radius: 16px;
+  padding: 14px 18px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+}
+
+.loc-prompt.open { display: block; }
+
+.loc-prompt-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.loc-prompt-icon {
+  font-size: 26px;
+  flex-shrink: 0;
+}
+
+.loc-prompt-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.loc-prompt-text strong {
+  color: #ffb703;
+  font-size: 15px;
+}
+
+.loc-prompt-text span {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+.loc-prompt-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.loc-btn {
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.loc-btn-allow {
+  background: #ffb703;
+  color: #111;
+}
+
+.loc-btn-allow:hover {
+  box-shadow: 0 0 15px rgba(255, 183, 3, 0.5);
+}
+
+.loc-btn-deny {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.loc-btn-deny:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 480px) {
+  .loc-prompt-card { flex-wrap: wrap; }
+  .loc-prompt-actions { width: 100%; justify-content: flex-end; }
+}
+
 /* Modal Tracklist */
 .tracklist-modal {
   display: none;

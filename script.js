@@ -395,6 +395,7 @@ function applyWeatherBackground(key) {
 
 function initWeatherBackground() {
   const DEFAULT_LOC = { lat: 28.62137, lon: 77.2148 };
+  const choice = localStorage.getItem("tb_loc_choice");
 
   function fetchWeather(lat, lon) {
     return fetch(
@@ -420,22 +421,68 @@ function initWeatherBackground() {
       .catch(() => {});
   }
 
-  fetch("https://ip-api.com/json/", { signal: AbortSignal.timeout(8000) })
-    .then((r) => r.json())
-    .then((loc) => {
-      if (loc && loc.status === "success" && loc.lat && loc.lon) {
-        console.log("Weather location:", loc.city, loc.regionName, loc.lat, loc.lon, "IP:", loc.query);
-        return fetchWeather(loc.lat, loc.lon);
-      }
-      console.warn("IP lookup failed, using Delhi default:", loc);
-      return fetchWeather(DEFAULT_LOC.lat, DEFAULT_LOC.lon);
-    })
-    .catch((e) => {
-      console.warn("IP lookup error, using Delhi default:", e);
-      return fetchWeather(DEFAULT_LOC.lat, DEFAULT_LOC.lon);
-    });
+  function resolveByIp() {
+    fetch("https://ip-api.com/json/", { signal: AbortSignal.timeout(8000) })
+      .then((r) => r.json())
+      .then((loc) => {
+        if (loc && loc.status === "success" && loc.lat && loc.lon) {
+          console.log("Weather location (IP):", loc.city, loc.regionName, loc.lat, loc.lon, "IP:", loc.query);
+          return fetchWeather(loc.lat, loc.lon);
+        }
+        console.warn("IP lookup failed, using Delhi default:", loc);
+        return fetchWeather(DEFAULT_LOC.lat, DEFAULT_LOC.lon);
+      })
+      .catch((e) => {
+        console.warn("IP lookup error, using Delhi default:", e);
+        return fetchWeather(DEFAULT_LOC.lat, DEFAULT_LOC.lon);
+      });
+  }
 
-  setInterval(initWeatherBackground, 30 * 60 * 1000);
+  function useGps() {
+    if (!navigator.geolocation) {
+      console.warn("GPS not supported, using IP lookup");
+      return resolveByIp();
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        console.log("Weather location (GPS):", pos.coords.latitude, pos.coords.longitude);
+        fetchWeather(pos.coords.latitude, pos.coords.longitude);
+      },
+      (err) => {
+        console.warn("GPS denied/error, using IP lookup:", err.message);
+        resolveByIp();
+      },
+      { timeout: 8000, maximumAge: 10 * 60 * 1000 }
+    );
+  }
+
+  if (choice === "allow") {
+    useGps();
+  } else if (choice === "deny") {
+    resolveByIp();
+  } else {
+    showLocationPrompt(useGps, resolveByIp);
+  }
+
+  if (!initWeatherBackground._timer) {
+    initWeatherBackground._timer = setInterval(initWeatherBackground, 30 * 60 * 1000);
+  }
+}
+
+function showLocationPrompt(onAllow, onDeny) {
+  const box = document.getElementById("locPrompt");
+  if (!box) return onDeny();
+  box.classList.add("open");
+  document.getElementById("locAllowBtn").onclick = () => {
+    localStorage.setItem("tb_loc_choice", "allow");
+    box.classList.remove("open");
+    onAllow();
+  };
+  document.getElementById("locDenyBtn").onclick = () => {
+    localStorage.setItem("tb_loc_choice", "deny");
+    box.classList.remove("open");
+    onDeny();
+  };
 }
 function initWindowRainCanvas() {
   const container = document.getElementById("windowRainBox");

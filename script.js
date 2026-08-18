@@ -360,8 +360,11 @@ const WEATHER_BG = {
   night: "assets/bg-night.png"
 };
 
-function weatherKeyFromCode(code, isDay) {
-  if (code <= 1) return isDay ? "clear" : "night";
+function weatherKeyFromCode(code, isDay, cloudCover) {
+  if (code <= 1) {
+    if (!isDay && cloudCover > 30) return "cloudy";
+    return isDay ? "clear" : "night";
+  }
   if (code <= 3) return "cloudy";
   if (code === 45 || code === 48) return "foggy";
   if (code <= 57) return "drizzle";
@@ -399,13 +402,18 @@ function initWeatherBackground() {
         lat +
         "&longitude=" +
         lon +
-        "&current=weather_code,is_day&timezone=auto",
+        "&current=weather_code,is_day,cloud_cover&timezone=auto",
       { signal: AbortSignal.timeout(8000) }
     )
       .then((r) => r.json())
       .then((data) => {
         if (data && data.current) {
-          const key = weatherKeyFromCode(data.current.weather_code, data.current.is_day === 1);
+          const key = weatherKeyFromCode(
+            data.current.weather_code,
+            data.current.is_day === 1,
+            data.current.cloud_cover
+          );
+          console.log("Weather:", data.current.weather_code, "is_day:", data.current.is_day, "cloud:", data.current.cloud_cover, "->", key);
           applyWeatherBackground(key);
         }
       })
@@ -416,11 +424,16 @@ function initWeatherBackground() {
     .then((r) => r.json())
     .then((loc) => {
       if (loc && loc.status === "success" && loc.lat && loc.lon) {
+        console.log("Weather location:", loc.city, loc.regionName, loc.lat, loc.lon, "IP:", loc.query);
         return fetchWeather(loc.lat, loc.lon);
       }
+      console.warn("IP lookup failed, using Delhi default:", loc);
       return fetchWeather(DEFAULT_LOC.lat, DEFAULT_LOC.lon);
     })
-    .catch(() => fetchWeather(DEFAULT_LOC.lat, DEFAULT_LOC.lon));
+    .catch((e) => {
+      console.warn("IP lookup error, using Delhi default:", e);
+      return fetchWeather(DEFAULT_LOC.lat, DEFAULT_LOC.lon);
+    });
 
   setInterval(initWeatherBackground, 30 * 60 * 1000);
 }

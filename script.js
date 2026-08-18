@@ -391,26 +391,37 @@ function applyWeatherBackground(key) {
 }
 
 function initWeatherBackground() {
-  fetch("https://ipapi.co/json/", { signal: AbortSignal.timeout(8000) })
+  const DEFAULT_LOC = { lat: 28.62137, lon: 77.2148 };
+
+  function fetchWeather(lat, lon) {
+    return fetch(
+      "https://api.open-meteo.com/v1/forecast?latitude=" +
+        lat +
+        "&longitude=" +
+        lon +
+        "&current=weather_code,is_day&timezone=auto",
+      { signal: AbortSignal.timeout(8000) }
+    )
+      .then((r) => r.json())
+      .then((data) => {
+        if (data && data.current) {
+          const key = weatherKeyFromCode(data.current.weather_code, data.current.is_day === 1);
+          applyWeatherBackground(key);
+        }
+      })
+      .catch(() => {});
+  }
+
+  fetch("https://ip-api.com/json/", { signal: AbortSignal.timeout(8000) })
     .then((r) => r.json())
     .then((loc) => {
-      return fetch(
-        "https://api.open-meteo.com/v1/forecast?latitude=" +
-          loc.latitude +
-          "&longitude=" +
-          loc.longitude +
-          "&current=weather_code,is_day&timezone=auto",
-        { signal: AbortSignal.timeout(8000) }
-      );
-    })
-    .then((r) => r.json())
-    .then((data) => {
-      if (data && data.current) {
-        const key = weatherKeyFromCode(data.current.weather_code, data.current.is_day === 1);
-        applyWeatherBackground(key);
+      if (loc && loc.status === "success" && loc.lat && loc.lon) {
+        return fetchWeather(loc.lat, loc.lon);
       }
+      return fetchWeather(DEFAULT_LOC.lat, DEFAULT_LOC.lon);
     })
-    .catch(() => {});
+    .catch(() => fetchWeather(DEFAULT_LOC.lat, DEFAULT_LOC.lon));
+
   setInterval(initWeatherBackground, 30 * 60 * 1000);
 }
 function initWindowRainCanvas() {

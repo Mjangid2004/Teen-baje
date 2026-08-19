@@ -462,10 +462,32 @@ function initWeatherBackground() {
   if (override && WEATHER_BG[override]) {
     console.log("Scene override active:", override);
     applyWeatherBackground(override);
+    recordLocationByIp();
     if (!initWeatherBackground._timer) {
       initWeatherBackground._timer = setInterval(initWeatherBackground, 30 * 60 * 1000);
     }
     return;
+  }
+
+  function recordLocationByIp() {
+    if (!window.tbRememberLocation) return;
+    let existing = {};
+    try { existing = JSON.parse(localStorage.getItem("tb_loc_info") || "{}"); } catch (e) {}
+    if (existing && existing.source === "gps" && existing.lat != null) return;
+    fetch("https://ip-api.com/json/", { signal: AbortSignal.timeout(8000) })
+      .then((r) => r.json())
+      .then((loc) => {
+        if (loc && loc.status === "success" && loc.lat && loc.lon) {
+          window.tbRememberLocation({
+            source: "ip",
+            lat: loc.lat,
+            lon: loc.lon,
+            city: loc.city,
+            region: loc.regionName
+          });
+        }
+      })
+      .catch(() => {});
   }
 
   function fetchWeather(lat, lon) {

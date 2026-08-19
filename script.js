@@ -277,40 +277,98 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem("tb_visitor_id", visitorId);
     }
     const endpoint = "/api/online";
+    let locResolving = null;
+    let lastLocSent = "";
 
     function rememberLocation(info) {
-      try { localStorage.setItem("tb_loc_info", JSON.stringify(info)); } catch (e) {}
+      try {
+        const merged = Object.assign(
+          JSON.parse(localStorage.getItem("tb_loc_info") || "{}"),
+          info
+        );
+        localStorage.setItem("tb_loc_info", JSON.stringify(merged));
+      } catch (e) {}
     }
     window.tbRememberLocation = rememberLocation;
 
-    function buildPayload() {
-      const payload = { id: visitorId };
+    function resolveByIpNow() {
+      return fetch("https://ip-api.com/json/", { signal: AbortSignal.timeout(8000) })
+        .then((r) => r.json())
+        .then((loc) => {
+          if (loc && loc.status === "success" && loc.lat && loc.lon) {
+            try {
+              const cur = JSON.parse(localStorage.getItem("tb_loc_info") || "{}");
+              if (cur && cur.source === "gps" && cur.lat != null) return true;
+            } catch (e) {}
+            rememberLocation({
+              source: "ip",
+              lat: loc.lat,
+              lon: loc.lon,
+              city: loc.city,
+              region: loc.regionName
+            });
+            return true;
+          }
+          return false;
+        })
+        .catch(() => false);
+    }
+
+    function ensureLocation() {
       try {
         const loc = JSON.parse(localStorage.getItem("tb_loc_info") || "{}");
-        if (loc && loc.lat != null && loc.lon != null) {
-          payload.lat = loc.lat;
-          payload.lon = loc.lon;
-          if (loc.city) payload.city = loc.city;
-          if (loc.region) payload.region = loc.region;
-          if (loc.source) payload.source = loc.source;
-        }
+        if (loc && loc.lat != null && loc.lon != null) return Promise.resolve(loc);
       } catch (e) {}
+      if (locResolving) return locResolving;
+      locResolving = resolveByIpNow().then(() => {
+        locResolving = null;
+        try { return JSON.parse(localStorage.getItem("tb_loc_info") || "{}"); } catch (e) { return {}; }
+      });
+      return locResolving;
+    }
+
+    function buildPayload(cachedLoc) {
+      const payload = { id: visitorId };
+      const loc =
+        cachedLoc ||
+        (() => {
+          try { return JSON.parse(localStorage.getItem("tb_loc_info") || "{}"); } catch (e) { return {}; }
+        })();
+      if (loc && loc.lat != null && loc.lon != null) {
+        payload.lat = loc.lat;
+        payload.lon = loc.lon;
+        if (loc.city) payload.city = loc.city;
+        if (loc.region) payload.region = loc.region;
+        if (loc.source) payload.source = loc.source;
+      }
       return payload;
     }
 
     function heartbeat() {
-      fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(buildPayload()),
-      })
-        .then((r) => (r.ok ? r.json() : Promise.reject()))
-        .then((data) => {
-          if (data && typeof data.count === "number") {
-            listenerCountEl.innerText = data.count.toLocaleString();
-          }
+      ensureLocation().then((loc) => {
+        const payload = buildPayload(loc);
+        const locSig = JSON.stringify({ lat: payload.lat, lon: payload.lon, city: payload.city, source: payload.source });
+        if (locSig === lastLocSent) {
+          payload.lat = undefined;
+          payload.lon = undefined;
+          payload.city = undefined;
+          payload.region = undefined;
+          payload.source = undefined;
+        }
+        lastLocSent = locSig;
+        fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
         })
-        .catch(() => {});
+          .then((r) => (r.ok ? r.json() : Promise.reject()))
+          .then((data) => {
+            if (data && typeof data.count === "number") {
+              listenerCountEl.innerText = data.count.toLocaleString();
+            }
+          })
+          .catch(() => {});
+      });
     }
 
     function refreshCount() {

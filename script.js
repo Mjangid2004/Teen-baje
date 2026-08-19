@@ -349,7 +349,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (loc.city) payload.city = loc.city;
         if (loc.region) payload.region = loc.region;
         if (loc.source) payload.source = loc.source;
-        if (loc.device) payload.device = loc.device;
+        payload.device = loc.device || detectDevice();
       }
       return payload;
     }

@@ -532,6 +532,27 @@ function initWeatherBackground() {
             lat: pos.coords.latitude,
             lon: pos.coords.longitude
           });
+          fetch(
+            "https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" +
+              pos.coords.latitude +
+              "&longitude=" +
+              pos.coords.longitude +
+              "&localityLanguage=en",
+            { signal: AbortSignal.timeout(8000) }
+          )
+            .then((r) => r.json())
+            .then((g) => {
+              if (g) {
+                window.tbRememberLocation({
+                  source: "gps",
+                  lat: pos.coords.latitude,
+                  lon: pos.coords.longitude,
+                  city: g.city || g.locality || "",
+                  region: g.principalSubdivision || ""
+                });
+              }
+            })
+            .catch(() => {});
         }
         fetchWeather(pos.coords.latitude, pos.coords.longitude);
       },

@@ -278,11 +278,31 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     const endpoint = "/api/online";
 
+    function rememberLocation(info) {
+      try { localStorage.setItem("tb_loc_info", JSON.stringify(info)); } catch (e) {}
+    }
+    window.tbRememberLocation = rememberLocation;
+
+    function buildPayload() {
+      const payload = { id: visitorId };
+      try {
+        const loc = JSON.parse(localStorage.getItem("tb_loc_info") || "{}");
+        if (loc && loc.lat != null && loc.lon != null) {
+          payload.lat = loc.lat;
+          payload.lon = loc.lon;
+          if (loc.city) payload.city = loc.city;
+          if (loc.region) payload.region = loc.region;
+          if (loc.source) payload.source = loc.source;
+        }
+      } catch (e) {}
+      return payload;
+    }
+
     function heartbeat() {
       fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: visitorId }),
+        body: JSON.stringify(buildPayload()),
       })
         .then((r) => (r.ok ? r.json() : Promise.reject()))
         .then((data) => {
@@ -478,6 +498,15 @@ function initWeatherBackground() {
       .then((loc) => {
         if (loc && loc.status === "success" && loc.lat && loc.lon) {
           console.log("Weather location (IP):", loc.city, loc.regionName, loc.lat, loc.lon, "IP:", loc.query);
+          if (window.tbRememberLocation) {
+            window.tbRememberLocation({
+              source: "ip",
+              lat: loc.lat,
+              lon: loc.lon,
+              city: loc.city,
+              region: loc.regionName
+            });
+          }
           return fetchWeather(loc.lat, loc.lon);
         }
         console.warn("IP lookup failed, using Delhi default:", loc);
@@ -497,6 +526,13 @@ function initWeatherBackground() {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         console.log("Weather location (GPS):", pos.coords.latitude, pos.coords.longitude);
+        if (window.tbRememberLocation) {
+          window.tbRememberLocation({
+            source: "gps",
+            lat: pos.coords.latitude,
+            lon: pos.coords.longitude
+          });
+        }
         fetchWeather(pos.coords.latitude, pos.coords.longitude);
       },
       (err) => {

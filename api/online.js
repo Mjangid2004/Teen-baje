@@ -29,6 +29,17 @@ module.exports = async function handler(req, res) {
       last_seen BIGINT NOT NULL
     )`;
 
+    await sql`CREATE TABLE IF NOT EXISTS visit_locations (
+      id TEXT PRIMARY KEY,
+      source TEXT,
+      lat DOUBLE PRECISION,
+      lon DOUBLE PRECISION,
+      city TEXT,
+      region TEXT,
+      first_seen BIGINT NOT NULL,
+      last_seen BIGINT NOT NULL
+    )`;
+
     const now = Date.now();
 
     if (req.method === "POST") {
@@ -39,6 +50,21 @@ module.exports = async function handler(req, res) {
       const cleanId = id.slice(0, 200);
       await sql`INSERT INTO online_users (id, last_seen) VALUES (${cleanId}, ${now})
                 ON CONFLICT (id) DO UPDATE SET last_seen = ${now}`;
+
+      const body = req.body || {};
+      const lat = Number(body.lat);
+      const lon = Number(body.lon);
+      const hasLoc = !isNaN(lat) && !isNaN(lon) && isFinite(lat) && isFinite(lon);
+      if (hasLoc) {
+        const source = typeof body.source === "string" ? body.source.slice(0, 16) : "";
+        const city = typeof body.city === "string" ? body.city.slice(0, 100) : "";
+        const region = typeof body.region === "string" ? body.region.slice(0, 100) : "";
+        await sql`INSERT INTO visit_locations (id, source, lat, lon, city, region, first_seen, last_seen)
+                  VALUES (${cleanId}, ${source}, ${lat}, ${lon}, ${city}, ${region}, ${now}, ${now})
+                  ON CONFLICT (id) DO UPDATE
+                    SET source = ${source}, lat = ${lat}, lon = ${lon},
+                        city = ${city}, region = ${region}, last_seen = ${now}`;
+      }
     }
 
     const staleCutoff = now - STALE_AFTER_MS;

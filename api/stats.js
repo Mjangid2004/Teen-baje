@@ -56,8 +56,9 @@ module.exports = async function handler(req, res) {
       last_seen BIGINT NOT NULL
     )`;
     await sql`ALTER TABLE visit_locations ADD COLUMN IF NOT EXISTS device TEXT`;
+    await sql`ALTER TABLE visit_locations ADD COLUMN IF NOT EXISTS ua TEXT`;
 
-    const rows = await sql`SELECT source, lat, lon, city, region, device, first_seen, last_seen
+    const rows = await sql`SELECT source, lat, lon, city, region, device, ua, first_seen, last_seen
                            FROM visit_locations
                            ORDER BY last_seen DESC
                            LIMIT 200`;
@@ -69,6 +70,8 @@ module.exports = async function handler(req, res) {
         lon: r.lon,
         city: r.city || "",
         region: r.region || "",
+        device: r.device || "",
+        ua: r.ua || "",
         firstSeen: fmtTime(r.first_seen),
         lastSeen: fmtTime(r.last_seen)
       }));
@@ -79,8 +82,10 @@ module.exports = async function handler(req, res) {
       .map((r) => {
         const source = r.source === "gps" ? "🎯 GPS" : r.source === "ip" ? "📡 IP" : "–";
         const device = r.device === "mobile" ? "📱 Mobile" : r.device === "tablet" ? "📲 Tablet" : r.device === "desktop" ? "💻 Laptop" : "–";
+        const ua = r.ua ? esc(r.ua) : "–";
         const city = r.city ? esc(r.city) : "–";
         const region = r.region ? esc(r.region) : "";
+        const joinPlace = city + (region && city !== "–" ? ", " + region : region);
         const coords =
           r.lat != null && r.lon != null
             ? `<a class="map-link" target="_blank" rel="noopener" href="https://www.google.com/maps?q=${Number(r.lat)},${Number(r.lon)}">📍 ${Number(r.lat).toFixed(4)}, ${Number(r.lon).toFixed(4)}</a>`
@@ -88,10 +93,11 @@ module.exports = async function handler(req, res) {
         return `<tr>
           <td>${device}</td>
           <td>${source}</td>
-          <td>${city}${region ? "<span class='sub'>" + region + "</span>" : ""}</td>
+          <td>${joinPlace}</td>
           <td class="mono">${coords}</td>
           <td class="mono">${fmtTime(r.last_seen)}</td>
           <td class="mono">${fmtTime(r.first_seen)}</td>
+          <td class="sub">${ua}</td>
         </tr>`;
       })
       .join("");
@@ -124,7 +130,7 @@ module.exports = async function handler(req, res) {
   </div>
   <div class="card">
     <table>
-      <thead><tr><th>Device</th><th>Source</th><th>Place</th><th>Coords</th><th>Last seen</th><th>First seen</th></tr></thead>
+      <thead><tr><th>Device</th><th>Source</th><th>Place</th><th>Coords</th><th>Last seen</th><th>First seen</th><th>User agent</th></tr></thead>
       <tbody>${rowsHtml}</tbody>
     </table>
   </div>

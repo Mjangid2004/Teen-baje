@@ -42,6 +42,7 @@ module.exports = async function handler(req, res) {
     )`;
 
     await sql`ALTER TABLE visit_locations ADD COLUMN IF NOT EXISTS device TEXT`;
+    await sql`ALTER TABLE visit_locations ADD COLUMN IF NOT EXISTS ua TEXT`;
 
     const now = Date.now();
 
@@ -59,6 +60,8 @@ module.exports = async function handler(req, res) {
       const lon = Number(body.lon);
       const hasLoc = !isNaN(lat) && !isNaN(lon) && isFinite(lat) && isFinite(lon);
       const device = typeof body.device === "string" ? body.device.slice(0, 16) : "";
+      const uaRaw = req.headers["user-agent"] || "";
+      const ua = typeof uaRaw === "string" ? uaRaw.slice(0, 200) : "";
       let source = hasLoc && typeof body.source === "string" ? body.source.slice(0, 16) : "";
       let city = hasLoc && typeof body.city === "string" ? body.city.slice(0, 100) : "";
       let region = hasLoc && typeof body.region === "string" ? body.region.slice(0, 100) : "";
@@ -89,11 +92,11 @@ module.exports = async function handler(req, res) {
       }
 
       if (finalLat != null && finalLon != null) {
-        await sql`INSERT INTO visit_locations (id, source, lat, lon, city, region, device, first_seen, last_seen)
-                  VALUES (${cleanId}, ${source}, ${finalLat}, ${finalLon}, ${city}, ${region}, ${device}, ${now}, ${now})
+        await sql`INSERT INTO visit_locations (id, source, lat, lon, city, region, device, ua, first_seen, last_seen)
+                  VALUES (${cleanId}, ${source}, ${finalLat}, ${finalLon}, ${city}, ${region}, ${device}, ${ua}, ${now}, ${now})
                   ON CONFLICT (id) DO UPDATE
                     SET source = ${source}, lat = ${finalLat}, lon = ${finalLon},
-                        city = ${city}, region = ${region}, device = ${device}, last_seen = ${now}`;
+                        city = ${city}, region = ${region}, device = ${device}, ua = ${ua}, last_seen = ${now}`;
       }
     }
 

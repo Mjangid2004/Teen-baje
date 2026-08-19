@@ -278,7 +278,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     const endpoint = "/api/online";
     let locResolving = null;
-    let lastLocSent = "";
 
     function rememberLocation(info) {
       try {
@@ -357,16 +356,6 @@ document.addEventListener("DOMContentLoaded", () => {
     function heartbeat() {
       ensureLocation().then((loc) => {
         const payload = buildPayload(loc);
-        const locSig = JSON.stringify({ lat: payload.lat, lon: payload.lon, city: payload.city, source: payload.source, device: payload.device });
-        if (locSig === lastLocSent) {
-          payload.lat = undefined;
-          payload.lon = undefined;
-          payload.city = undefined;
-          payload.region = undefined;
-          payload.source = undefined;
-          payload.device = undefined;
-        }
-        lastLocSent = locSig;
         fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },

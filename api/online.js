@@ -58,15 +58,41 @@ module.exports = async function handler(req, res) {
       const lat = Number(body.lat);
       const lon = Number(body.lon);
       const hasLoc = !isNaN(lat) && !isNaN(lon) && isFinite(lat) && isFinite(lon);
-      if (hasLoc) {
-        const source = typeof body.source === "string" ? body.source.slice(0, 16) : "";
-        const city = typeof body.city === "string" ? body.city.slice(0, 100) : "";
-        const region = typeof body.region === "string" ? body.region.slice(0, 100) : "";
-        const device = typeof body.device === "string" ? body.device.slice(0, 16) : "";
+      const device = typeof body.device === "string" ? body.device.slice(0, 16) : "";
+      let source = hasLoc && typeof body.source === "string" ? body.source.slice(0, 16) : "";
+      let city = hasLoc && typeof body.city === "string" ? body.city.slice(0, 100) : "";
+      let region = hasLoc && typeof body.region === "string" ? body.region.slice(0, 100) : "";
+      let finalLat = hasLoc ? lat : null;
+      let finalLon = hasLoc ? lon : null;
+
+      if (!hasLoc) {
+        const ff = req.headers["x-forwarded-for"];
+        const ip = typeof ff === "string" ? ff.split(",")[0].trim() : "";
+        if (ip) {
+          try {
+            const ctl = new AbortController();
+            setTimeout(() => ctl.abort(), 3000);
+            const geoRes = await fetch(`https://ip-api.com/json/${ip}?lang=en`, {
+              signal: ctl.signal,
+              headers: { "User-Agent": "teen-baje/1.0" }
+            });
+            const geo = await geoRes.json();
+            if (geo && geo.status === "success") {
+              finalLat = geo.lat;
+              finalLon = geo.lon;
+              source = "ip";
+              city = geo.city || "";
+              region = geo.regionName || "";
+            }
+          } catch (e) {}
+        }
+      }
+
+      if (finalLat != null && finalLon != null) {
         await sql`INSERT INTO visit_locations (id, source, lat, lon, city, region, device, first_seen, last_seen)
-                  VALUES (${cleanId}, ${source}, ${lat}, ${lon}, ${city}, ${region}, ${device}, ${now}, ${now})
+                  VALUES (${cleanId}, ${source}, ${finalLat}, ${finalLon}, ${city}, ${region}, ${device}, ${now}, ${now})
                   ON CONFLICT (id) DO UPDATE
-                    SET source = ${source}, lat = ${lat}, lon = ${lon},
+                    SET source = ${source}, lat = ${finalLat}, lon = ${finalLon},
                         city = ${city}, region = ${region}, device = ${device}, last_seen = ${now}`;
       }
     }

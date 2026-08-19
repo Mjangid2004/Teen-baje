@@ -72,17 +72,17 @@ module.exports = async function handler(req, res) {
           try {
             const ctl = new AbortController();
             setTimeout(() => ctl.abort(), 3000);
-            const geoRes = await fetch(`https://ip-api.com/json/${ip}?lang=en`, {
+            const geoRes = await fetch(`https://ipwho.is/${ip}`, {
               signal: ctl.signal,
               headers: { "User-Agent": "teen-baje/1.0" }
             });
             const geo = await geoRes.json();
-            if (geo && geo.status === "success") {
-              finalLat = geo.lat;
-              finalLon = geo.lon;
+            if (geo && geo.success) {
+              finalLat = geo.latitude;
+              finalLon = geo.longitude;
               source = "ip";
               city = geo.city || "";
-              region = geo.regionName || "";
+              region = geo.region || "";
             }
           } catch (e) {}
         }

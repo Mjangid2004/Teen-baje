@@ -78,7 +78,10 @@ module.exports = async function handler(req, res) {
         const source = r.source === "gps" ? "🎯 GPS" : r.source === "ip" ? "📡 IP" : "–";
         const city = r.city ? esc(r.city) : "–";
         const region = r.region ? esc(r.region) : "";
-        const coords = r.lat != null && r.lon != null ? `${Number(r.lat).toFixed(4)}, ${Number(r.lon).toFixed(4)}` : "–";
+        const coords =
+          r.lat != null && r.lon != null
+            ? `<a class="map-link" target="_blank" rel="noopener" href="https://www.google.com/maps?q=${Number(r.lat)},${Number(r.lon)}">📍 ${Number(r.lat).toFixed(4)}, ${Number(r.lon).toFixed(4)}</a>`
+            : "–";
         return `<tr>
           <td>${source}</td>
           <td>${city}${region ? "<span class='sub'>" + region + "</span>" : ""}</td>
@@ -100,6 +103,8 @@ module.exports = async function handler(req, res) {
   h1 { color:#ffb703; font-size:20px; margin:0 0 4px; }
   .sub { color:#888; font-size:12px; }
   .mono { font-family: 'JetBrains Mono', Consolas, monospace; font-size:12px; color:#9db4ff; }
+  .map-link { color:#ffb703; text-decoration:none; }
+  .map-link:hover { text-decoration:underline; }
   .card { background:#161820; border:1px solid rgba(255,183,3,0.25); border-radius:12px; padding:14px; margin-bottom:14px; }
   .meta { color:#aaa; font-size:12px; margin-bottom:10px; }
   table { width:100%; border-collapse:collapse; font-size:13px; }

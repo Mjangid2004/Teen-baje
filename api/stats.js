@@ -51,11 +51,13 @@ module.exports = async function handler(req, res) {
       lon DOUBLE PRECISION,
       city TEXT,
       region TEXT,
+      device TEXT,
       first_seen BIGINT NOT NULL,
       last_seen BIGINT NOT NULL
     )`;
+    await sql`ALTER TABLE visit_locations ADD COLUMN IF NOT EXISTS device TEXT`;
 
-    const rows = await sql`SELECT source, lat, lon, city, region, first_seen, last_seen
+    const rows = await sql`SELECT source, lat, lon, city, region, device, first_seen, last_seen
                            FROM visit_locations
                            ORDER BY last_seen DESC
                            LIMIT 200`;
@@ -76,6 +78,7 @@ module.exports = async function handler(req, res) {
     const rowsHtml = rows
       .map((r) => {
         const source = r.source === "gps" ? "🎯 GPS" : r.source === "ip" ? "📡 IP" : "–";
+        const device = r.device === "mobile" ? "📱 Mobile" : r.device === "tablet" ? "📲 Tablet" : r.device === "desktop" ? "💻 Laptop" : "–";
         const city = r.city ? esc(r.city) : "–";
         const region = r.region ? esc(r.region) : "";
         const coords =
@@ -83,6 +86,7 @@ module.exports = async function handler(req, res) {
             ? `<a class="map-link" target="_blank" rel="noopener" href="https://www.google.com/maps?q=${Number(r.lat)},${Number(r.lon)}">📍 ${Number(r.lat).toFixed(4)}, ${Number(r.lon).toFixed(4)}</a>`
             : "–";
         return `<tr>
+          <td>${device}</td>
           <td>${source}</td>
           <td>${city}${region ? "<span class='sub'>" + region + "</span>" : ""}</td>
           <td class="mono">${coords}</td>
@@ -120,7 +124,7 @@ module.exports = async function handler(req, res) {
   </div>
   <div class="card">
     <table>
-      <thead><tr><th>Source</th><th>Place</th><th>Coords</th><th>Last seen</th><th>First seen</th></tr></thead>
+      <thead><tr><th>Device</th><th>Source</th><th>Place</th><th>Coords</th><th>Last seen</th><th>First seen</th></tr></thead>
       <tbody>${rowsHtml}</tbody>
     </table>
   </div>

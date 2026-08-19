@@ -286,10 +286,19 @@ document.addEventListener("DOMContentLoaded", () => {
           JSON.parse(localStorage.getItem("tb_loc_info") || "{}"),
           info
         );
+        if (!merged.device) merged.device = detectDevice();
         localStorage.setItem("tb_loc_info", JSON.stringify(merged));
       } catch (e) {}
     }
     window.tbRememberLocation = rememberLocation;
+
+    function detectDevice() {
+      const ua = navigator.userAgent || "";
+      if (/ipad|tablet/i.test(ua) || (navigator.maxTouchPoints > 1 && /macintosh/i.test(ua))) return "tablet";
+      if (/android|iphone|ipod/i.test(ua) && navigator.maxTouchPoints > 1) return "mobile";
+      if (/mobile/i.test(ua)) return "mobile";
+      return "desktop";
+    }
 
     function resolveByIpNow() {
       return fetch("https://ip-api.com/json/", { signal: AbortSignal.timeout(8000) })
@@ -340,6 +349,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (loc.city) payload.city = loc.city;
         if (loc.region) payload.region = loc.region;
         if (loc.source) payload.source = loc.source;
+        if (loc.device) payload.device = loc.device;
       }
       return payload;
     }
@@ -347,13 +357,14 @@ document.addEventListener("DOMContentLoaded", () => {
     function heartbeat() {
       ensureLocation().then((loc) => {
         const payload = buildPayload(loc);
-        const locSig = JSON.stringify({ lat: payload.lat, lon: payload.lon, city: payload.city, source: payload.source });
+        const locSig = JSON.stringify({ lat: payload.lat, lon: payload.lon, city: payload.city, source: payload.source, device: payload.device });
         if (locSig === lastLocSent) {
           payload.lat = undefined;
           payload.lon = undefined;
           payload.city = undefined;
           payload.region = undefined;
           payload.source = undefined;
+          payload.device = undefined;
         }
         lastLocSent = locSig;
         fetch(endpoint, {

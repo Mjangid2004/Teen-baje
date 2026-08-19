@@ -36,9 +36,12 @@ module.exports = async function handler(req, res) {
       lon DOUBLE PRECISION,
       city TEXT,
       region TEXT,
+      device TEXT,
       first_seen BIGINT NOT NULL,
       last_seen BIGINT NOT NULL
     )`;
+
+    await sql`ALTER TABLE visit_locations ADD COLUMN IF NOT EXISTS device TEXT`;
 
     const now = Date.now();
 
@@ -59,11 +62,12 @@ module.exports = async function handler(req, res) {
         const source = typeof body.source === "string" ? body.source.slice(0, 16) : "";
         const city = typeof body.city === "string" ? body.city.slice(0, 100) : "";
         const region = typeof body.region === "string" ? body.region.slice(0, 100) : "";
-        await sql`INSERT INTO visit_locations (id, source, lat, lon, city, region, first_seen, last_seen)
-                  VALUES (${cleanId}, ${source}, ${lat}, ${lon}, ${city}, ${region}, ${now}, ${now})
+        const device = typeof body.device === "string" ? body.device.slice(0, 16) : "";
+        await sql`INSERT INTO visit_locations (id, source, lat, lon, city, region, device, first_seen, last_seen)
+                  VALUES (${cleanId}, ${source}, ${lat}, ${lon}, ${city}, ${region}, ${device}, ${now}, ${now})
                   ON CONFLICT (id) DO UPDATE
                     SET source = ${source}, lat = ${lat}, lon = ${lon},
-                        city = ${city}, region = ${region}, last_seen = ${now}`;
+                        city = ${city}, region = ${region}, device = ${device}, last_seen = ${now}`;
       }
     }
 

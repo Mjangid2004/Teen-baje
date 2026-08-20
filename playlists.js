@@ -125,8 +125,8 @@ window.PLAYLISTS = [
       { title: "Thinking Of You", artist: "AP Dhillon", yt: "uTZ1JqiQPk4" },
       { title: "Tu Shadya", artist: "Harvi", yt: "UNnpbiDdCOU" },
       { title: "Udaarian", artist: "Satinder Sartaj", yt: "9udS0mpi1L4" },
-      { title: "Sajjan Raazi Ho Jave", artist: "Satinder Sartaaj", yt: "t6vm8h5BDxo" },
-      { title: "Yeah Baby", artist: "Garry Sandhu", yt: "La0X3etugeI" },
+      { title: "Sajjan Raazi Ho Jave", artist: "Satinder Sartaaj", yt: "WuHl5dZXuZc" },
+      { title: "Yeah Baby", artist: "Garry Sandhu", yt: "G7RW-KVDeEo" },
     ]
   },
   {

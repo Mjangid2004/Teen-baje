@@ -71,6 +71,12 @@ window.PLAYLISTS = [
       { title: "SIMPLY US", artist: "Vikram Malik", yt: "L0WvAyzmE50" },
       { title: "Yaari Lekhe", artist: "Khasa Aala Chahar", yt: "FfQ2FwN6omM" },
       { title: "Yaari", artist: "Masoom Sharma", yt: "pEh_2kDfu2w" },
+      { title: "Treat Me Special", artist: "Rawme Hooda & MC Square", yt: "2oOWoN8IAF0" },
+      { title: "Rohtak Ke Albadi", artist: "Mohit Ladhotiya", yt: "GjfhaIl8uMA" },
+      { title: "Mein Pariya Bargi Chori", artist: "Raju Punjabi", yt: "ElAV_gkWFGI" },
+      { title: "Rail", artist: "Sumit Parta", yt: "vPF3Fl5LeY8" },
+      { title: "Ghane Gande", artist: "Sumit Parta", yt: "Llav5_-5idA" },
+      { title: "Zigane", artist: "Dhanda Nyoliwala", yt: "bUk1YcCPfpQ" },
     ]
   },
   {
@@ -127,6 +133,8 @@ window.PLAYLISTS = [
       { title: "Udaarian", artist: "Satinder Sartaj", yt: "9udS0mpi1L4" },
       { title: "Sajjan Raazi Ho Jave", artist: "Satinder Sartaaj", yt: "WuHl5dZXuZc" },
       { title: "Yeah Baby", artist: "Garry Sandhu", yt: "G7RW-KVDeEo" },
+      { title: "Behja", artist: "Parmish Verma", yt: "K7zPAPQcp0o" },
+      { title: "Baba Maal Tej Aa", artist: "Gur Sekhon", yt: "7tQz4vwbuY8" },
     ]
   },
   {

@@ -135,6 +135,7 @@ window.PLAYLISTS = [
       { title: "Yeah Baby", artist: "Garry Sandhu", yt: "G7RW-KVDeEo" },
       { title: "Behja", artist: "Parmish Verma", yt: "K7zPAPQcp0o" },
       { title: "Baba Maal Tej Aa", artist: "Gur Sekhon", yt: "7tQz4vwbuY8" },
+      { title: "Jogi", artist: "thiarajxtt & Bir", yt: "hzpazXpEC4w" },
     ]
   },
   {
@@ -158,6 +159,7 @@ window.PLAYLISTS = [
       { title: "Tumse Behtar", artist: "Various", yt: "MivKhlsMKL0" },
       { title: "Waqt Ki Chal", artist: "Kamal Arora", yt: "J7aglAvLUqU" },
       { title: "Ye Tune Kya Kiya", artist: "Pritam", yt: "w9Qo6p4XsXE" },
+      { title: "Tera Hone Laga Hoon", artist: "Atif Aslam", yt: "useznoRhrWU" },
     ]
   }
 ];

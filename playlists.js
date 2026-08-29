@@ -136,7 +136,7 @@ window.PLAYLISTS = [
       { title: "Behja", artist: "Parmish Verma", yt: "K7zPAPQcp0o" },
       { title: "Baba Maal Tej Aa", artist: "Gur Sekhon", yt: "7tQz4vwbuY8" },
       { title: "Jogi", artist: "thiarajxtt & Bir", yt: "hzpazXpEC4w" },
-      { title: "Sadi Sun", artist: "Elvish Yadav & Simrat Kaur", yt: "s_LTHc9ZRFM" },
+      { title: "Sadi Sun", artist: "Elvish Yadav & Simrat Kaur", yt: "QohIp3-Ygxk" },
     ]
   },
   {
